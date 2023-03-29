@@ -10,9 +10,15 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request, Site $site)
     {
+        $site->update(['default' => true]);
+
+        if (!$site->exists) {
+            $site = $request->user()->sites()->whereDefault(true)->first() ?? $request->user()->sites()->first();
+        }
+
         return inertia()->render('Dashboard', [
             'site' => new SiteResource($site),
-            'sites' => SiteResource::collection(Site::get())
+            'sites' => SiteResource::collection(Site::get()),
         ]);
     }
 }
